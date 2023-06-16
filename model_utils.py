@@ -2,6 +2,28 @@ import torch
 import torch.nn as nn
 
 
+class EncoderLeNet5Type(nn.Module):
+
+    def __init__(self, channels=[1,6,16,120]):
+        super().__init__()
+
+        self.extractor = nn.Sequential(
+            nn.Conv2d(in_channels=channels[0], out_channels=channels[1], kernel_size=5, padding=1, stride=1, bias=True),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=0),
+            nn.Conv2d(in_channels=channels[1], out_channels=channels[2], kernel_size=(5,5), padding=0, stride=1, bias=True),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
+            nn.Conv2d(in_channels=channels[2], out_channels=channels[3], kernel_size=(5,5), padding=0, stride=1, bias=True),
+            nn.ReLU(),
+        )
+
+    def forward(self, x):
+        x = self.extractor(x)
+        print(x.shape)
+        return x
+
+
 class EncoderUNetType(nn.Module):
 
     def __init__(self, in_channels, out_channels, depth, **kwargs):
