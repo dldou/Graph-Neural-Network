@@ -53,7 +53,6 @@ def compute_adj_mat(image):
     return adj
     
 
-
 def norm_adjacency(adj):
     """
         adj: numpy array
