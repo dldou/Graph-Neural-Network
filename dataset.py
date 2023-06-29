@@ -37,8 +37,12 @@ class CustomizableMNIST(datasets.MNIST):
                                         transforms.Normalize((0.1307,), (0.3081,))
                                        ])
         image_tens = transform(image)
-        image_tens = image_tens.permute(1,2,0).numpy()
-        return image_tens
+        image_numpy = image_tens.permute(1,2,0).numpy()
+
+        # print(image_numpy)
+        # print(target)
+
+        return image_numpy, target
 
 
 
