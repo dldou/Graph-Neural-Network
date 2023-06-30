@@ -8,20 +8,23 @@ class Trainer:
         self.device = device
         print("Trainer init done.\n")
 
-    def train_step(self, model, adj_mat,
+    def train_step(self, model,
                    dataloader,
                    optimizer, criterion):
 
         running_loss = 0.0
         model.train()
 
-        for images, targets in dataloader:
-            images, targets = images.to(self.device), targets.to(self.device)
+        for graph in dataloader:
             optimizer.zero_grad()
 
             # Predictions
-            targets_hat = model(images, adj_mat)
-            #Loss + backprop
+            targets = graph[-1].to(self.device)
+            targets_hat = model(graph[0].to(self.device), graph[1].to(self.device), targets)
+            # from (batch_size, 1, nb_classes) to (batch_size, nb_classes)
+            targets_hat = targets_hat.squeeze()
+
+            # Loss + backprop
             loss = criterion(targets_hat, targets)
             loss.backward()
             optimizer.step()
@@ -30,7 +33,7 @@ class Trainer:
             running_loss += loss.item()
         return running_loss / len(dataloader)
 
-    def valid_step(self, model, adj_mat, valid_loader, criterion):
+    def valid_step(self, model, valid_loader, criterion):
 
         model.eval()
         running_loss = 0.0
@@ -39,12 +42,13 @@ class Trainer:
 
         model.eval()
         with torch.no_grad():
-            for images, targets in valid_loader:
-                images, targets = images.to(self.device), targets.to(self.device)
-
-                # Inferences
-                targets_hat = model(images, adj_mat)
-
+            for graph in valid_loader:
+                # Inference
+                targets = graph[-1].to(self.device)
+                targets_hat = model(graph[0].to(self.device), graph[1].to(self.device), targets)
+                # from (batch_size, 1, nb_classes) to (batch_size, nb_classes)
+                targets_hat = targets_hat.squeeze()
+                
                 # loss
                 loss = criterion(targets_hat, targets)
                 running_loss += loss.item()
@@ -57,7 +61,7 @@ class Trainer:
 
         return running_loss / len(valid_loader), 100 * (running_accuracy / n_predictions)
 
-    def train(self, n_epochs, adj_mat,
+    def train(self, n_epochs,
               model, optimizer, criterion,
               train_dataloader, valid_dataloader,
               file_path_save_trained_model, file_path_save_best_acc_model, results_file_path,
@@ -83,8 +87,8 @@ class Trainer:
             train_epoch_loss = 0.0
             valid_epoch_loss = 0.0
 
-            train_epoch_loss = self.train_step(model, adj_mat, train_dataloader, optimizer, criterion)
-            valid_epoch_loss, epoch_accuracy = self.valid_step(model, adj_mat, valid_dataloader, criterion)
+            train_epoch_loss = self.train_step(model, train_dataloader, optimizer, criterion)
+            valid_epoch_loss, epoch_accuracy = self.valid_step(model, valid_dataloader, criterion)
 
             print(f'Epoch: {epoch}/{n_epochs}, {train_loss_name}: {train_epoch_loss:.4f}, {valid_loss_name}: {valid_epoch_loss:.4f}, {accuracy_name}: {epoch_accuracy:.2f}%')
 

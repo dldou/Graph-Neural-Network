@@ -8,10 +8,7 @@ class GCN_model(nn.Module):
         super(GCN_model, self).__init__()
         self.fc = nn.Linear(in_features=num_of_nodes, out_features=num_ofclass)
     
-    def forward(self, list_of_graph):
-        # unpack data
-        nodes_feat_list, edges_index_list, graph_label_list = list_of_graph
-
+    def forward(self, nodes_feat_list, edges_index_list, graph_label_list):
         # D ** (-1 / 2) of shape (num_of_nodes) only for one matrix as all graph got the same structure
         graph_degrees = self.compute_degree(edges_index_list, num_of_nodes=nodes_feat_list.shape[1])
 

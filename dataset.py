@@ -39,9 +39,6 @@ class CustomizableMNIST(datasets.MNIST):
         image_tens = transform(image)
         image_numpy = image_tens.permute(1,2,0).numpy()
 
-        # print(image_numpy)
-        # print(target)
-
         return image_numpy, target
 
 

@@ -57,19 +57,6 @@ class GraphData_fromMNIST(Data):
             graph.nodes[i]['pix_int'] = node_feat
 
 
-# graph_collection = []
-# num_graphs = 0
-# num_samples = len(train_set)
-# for image, label in train_set:
-#     graph_collection.append(GraphData_fromMNIST(image.squeeze(), label))
-#     num_graphs += 1
-#     print("\r" + "{:.1f} %".format( (num_graphs / num_samples) * 100), end="")
-#     #print("\r" + "{} / {}".format(num_graphs, len(train_set)), end="") 
-
-# with open('graph_collection_dataset.pkl', 'wb') as f:
-#     pkl.dump(graph_collection, f)
-
-
 class GraphDataset(Dataset):
 
     def __init__(self, graph_collection):
